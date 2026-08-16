@@ -21,10 +21,8 @@ interface InputState {
 export class ClientEngine {
   private net: NetworkClient;
   private input: InputState = { up: false, down: false, left: false, right: false };
-  private firing = false;
   private aimAngle = 0;
   private moveAccum = 0;
-  private fireAccum = 0;
   private myId: string;
   private latestPlayers: PlayerSnapshot[] = [];
   lastSnapshot: GameSnapshot | null = null;
@@ -59,8 +57,9 @@ export class ClientEngine {
     this.aimAngle = angle;
   }
 
-  setFiring(firing: boolean) {
-    this.firing = firing;
+  /** Fire a single shot on click. */
+  fireOnce() {
+    this.net.shoot(this.aimAngle);
   }
 
   /** Apply the latest authoritative snapshot (players only). */
@@ -87,12 +86,6 @@ export class ClientEngine {
     if (this.moveAccum >= MOVE_SEND_INTERVAL) {
       this.moveAccum = 0;
       this.net.move(mx, my, this.aimAngle);
-    }
-
-    this.fireAccum += dt;
-    if (this.firing && this.fireAccum >= 0.12) {
-      this.fireAccum = 0;
-      this.net.shoot(this.aimAngle);
     }
   }
 
