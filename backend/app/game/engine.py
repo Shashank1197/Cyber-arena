@@ -160,6 +160,7 @@ class GameEngine:
             return
         dt = max(0.0, min(dt, 0.1))
         self.time += dt
+        self._tick_cooldowns(dt)
         self._move_players(dt)
         self._update_projectiles(dt)
         self._update_capture(dt)
@@ -167,6 +168,11 @@ class GameEngine:
         self._update_score(dt)
         self._update_respawns(dt)
         self._check_state()
+
+    def _tick_cooldowns(self, dt: float) -> None:
+        for player in self.players.values():
+            if player.fire_cooldown > 0:
+                player.fire_cooldown = max(0.0, player.fire_cooldown - dt)
 
     def _move_players(self, dt: float) -> None:
         for player in self.players.values():
@@ -407,6 +413,14 @@ class GameEngine:
             if player.score >= C.SCORE_CAP:
                 self.state = "ended"
                 return
+        # A player who owns every node instantly captures the arena.
+        total = len(self.nodes)
+        if total > 0:
+            for player in self.players.values():
+                owned = sum(1 for n in self.nodes if n.owner_id == player.id)
+                if owned >= total:
+                    self.state = "ended"
+                    return
 
     # -------------------------------------------------------------- output
     def snapshot(self) -> dict:
