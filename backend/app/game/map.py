@@ -57,7 +57,7 @@ def valid_open_position(obstacles, x, y, radius, tries=40) -> tuple[float, float
     from .geometry import circle_rect_collide
 
     for _ in range(tries):
-        if not circle_rect_collide(x, y, radius, obstacles):
+        if not any(circle_rect_collide(x, y, radius, rect) for rect in obstacles):
             return (x, y)
         x = random.uniform(NODE_CAPTURE_RADIUS, ARENA_WIDTH - NODE_CAPTURE_RADIUS)
         y = random.uniform(NODE_CAPTURE_RADIUS, ARENA_HEIGHT - NODE_CAPTURE_RADIUS)

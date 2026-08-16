@@ -116,3 +116,15 @@ def test_match_ends_on_score_cap():
     engine.players["p1"].score = C.SCORE_CAP  # trigger win condition
     engine.update(0.05)
     assert engine.state == "ended"
+
+
+# --------------------------------------------------------------- power-ups
+def test_powerup_spawns_after_spawn_interval():
+    # Regression: the first power-up spawn must not crash the simulation
+    # (valid_open_position used to call circle_rect_collide on the whole
+    # obstacle list, raising AttributeError at ~6s / first spawn).
+    engine = _engine(("p1",))
+    for _ in range(int((C.POWERUP_SPAWN_INTERVAL + 0.5) / 0.05)):
+        engine.update(0.05)
+    assert len(engine.powerups) >= 1
+    assert engine.state == "playing"  # still alive after the spawn tick

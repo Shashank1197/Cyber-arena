@@ -241,13 +241,19 @@ class GameServer:
             loop = asyncio.get_running_loop()
             while room.state == "playing" and room.engine is not None:
                 t0 = loop.time()
-                room.engine.update(TICK_DELTA)
-                for ev in room.engine.drain_events():
-                    await self._broadcast(room, {"type": "event", "event": ev})
-                if room.engine.state == "ended":
-                    await self._finish_match(room)
+                try:
+                    room.engine.update(TICK_DELTA)
+                    for ev in room.engine.drain_events():
+                        await self._broadcast(room, {"type": "event", "event": ev})
+                    if room.engine.state == "ended":
+                        await self._finish_match(room)
+                        return
+                    await self._broadcast(room, {"type": "snapshot", "snapshot": room.engine.snapshot()})
+                except Exception:  # noqa: BLE001 - never let one bad tick freeze the match
+                    log.exception("Match %s crashed on a tick", room.code)
+                    room.return_to_lobby()
+                    await self._broadcast(room, {"type": "match_aborted", "reason": "Match error."})
                     return
-                await self._broadcast(room, {"type": "snapshot", "snapshot": room.engine.snapshot()})
                 elapsed = loop.time() - t0
                 await asyncio.sleep(max(0.0, TICK_DELTA - elapsed))
         except asyncio.CancelledError:
