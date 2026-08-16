@@ -10,6 +10,7 @@ import type {
   NodeSnapshot,
   PlayerSnapshot,
   PowerUpSnapshot,
+  ProjectileSnapshot,
 } from "../types";
 
 const POWERUP_COLORS: Record<string, string> = {
@@ -64,6 +65,7 @@ export class Renderer {
     this.drawArena();
     this.drawNodes(snapshot.nodes, snapshot.players);
     this.drawPowerUps(snapshot.powerups);
+    this.drawProjectiles(snapshot.projectiles);
     this.drawPlayers(snapshot.players);
 
     // Highlight the local player with a pulsing ring so their avatar is obvious.
@@ -186,6 +188,20 @@ export class Renderer {
       ctx.textBaseline = "middle";
       ctx.fillStyle = color;
       ctx.fillText(this.icon(pu.type), 0, 1);
+      ctx.restore();
+    }
+  }
+
+  private drawProjectiles(projectiles: ProjectileSnapshot[]) {
+    const ctx = this.ctx;
+    for (const p of projectiles) {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.angle);
+      ctx.fillStyle = "#ffe066";
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 8, 3, 0, 0, Math.PI * 2);
+      ctx.fill();
       ctx.restore();
     }
   }

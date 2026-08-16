@@ -447,6 +447,18 @@ class GameEngine:
                 {"id": p.id, "x": round(p.x, 1), "y": round(p.y, 1), "type": p.type}
                 for p in self.powerups
             ],
+            "projectiles": [
+                {
+                    "id": p.id,
+                    "owner_id": p.owner_id,
+                    "x": round(p.x, 1),
+                    "y": round(p.y, 1),
+                    "angle": round(p.angle, 3),
+                    "damage": round(p.damage, 1),
+                }
+                for p in self.projectiles.values()
+                if p.alive
+            ],
         }
 
     def results(self) -> list[dict]:

@@ -46,6 +46,15 @@ export interface PowerUpSnapshot {
   type: string;
 }
 
+export interface ProjectileSnapshot {
+  id: string;
+  owner_id: string;
+  x: number;
+  y: number;
+  angle: number;
+  damage: number;
+}
+
 export interface GameSnapshot {
   t: number;
   state: string;
@@ -53,6 +62,7 @@ export interface GameSnapshot {
   players: PlayerSnapshot[];
   nodes: NodeSnapshot[];
   powerups: PowerUpSnapshot[];
+  projectiles: ProjectileSnapshot[];
 }
 
 export interface MatchResult {
