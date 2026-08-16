@@ -118,6 +118,15 @@ export class GameSocket {
 }
 
 export function buildWsUrl(): string {
+  // Vercel / any split-host deploy: point the socket at the backend service.
+  // Set VITE_API_URL at build time, e.g. https://cyber-backend.onrender.com
+  const apiUrl = import.meta.env.VITE_API_URL as string | undefined;
+  if (apiUrl && apiUrl.trim()) {
+    const base = apiUrl.replace(/\/+$/, "");
+    const proto = base.startsWith("https:") ? "wss" : "ws";
+    return `${proto}://${base.replace(/^https?:\/\//, "")}/ws`;
+  }
+  // Same-origin deploy (docker-compose/nginx proxy): page origin routes /ws.
   const proto = window.location.protocol === "https:" ? "wss" : "ws";
   return `${proto}://${window.location.host}/ws`;
 }

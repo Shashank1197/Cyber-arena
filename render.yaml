@@ -1,0 +1,33 @@
+# Render Blueprint for Cyber Arena.
+# Deploys the backend (Docker) and frontend (Docker + nginx reverse proxy) as
+# two web services. The frontend serves the SPA and proxies /api and /ws to
+# the backend, so clients connect to a single origin.
+#
+# After first deploy, copy the backend's .onrender.com URL into the frontend's
+# BACKEND_HOST env var (format: https://backend-xxxx.onrender.com), then redeploy.
+services:
+  - type: web
+    name: cyber-arena-backend
+    runtime: docker
+    repo: https://github.com/YOUR_USER/YOUR_REPO
+    dockerfilePath: ./backend/Dockerfile
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: 8000
+      - key: CORS_ORIGINS
+        sync: false
+      - key: MONGO_URL
+        sync: false
+
+  - type: web
+    name: cyber-arena-frontend
+    runtime: docker
+    repo: https://github.com/YOUR_USER/YOUR_REPO
+    dockerfilePath: ./frontend/Dockerfile
+    envVars:
+      - key: BACKEND_HOST
+        sync: false
+      - key: BACKEND_PORT
+        value: 8000
