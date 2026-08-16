@@ -54,6 +54,17 @@ export class Renderer {
     this.offsetY = (height - ARENA_HEIGHT * this.scale) / 2;
   }
 
+  /** Map a client pixel to arena world coordinates (inverse camera transform). */
+  screenToWorld(clientX: number, clientY: number): { x: number; y: number } {
+    const rect = this.ctx.canvas.getBoundingClientRect();
+    const sx = clientX - rect.left;
+    const sy = clientY - rect.top;
+    return {
+      x: (sx - this.offsetX) / this.scale,
+      y: (sy - this.offsetY) / this.scale,
+    };
+  }
+
   draw(snapshot: GameSnapshot, localPlayer: PlayerSnapshot | null) {
     const ctx = this.ctx;
     const { scale, offsetX, offsetY } = this;

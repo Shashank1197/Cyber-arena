@@ -62,12 +62,10 @@ export function GameScreen({ client, playerId, snapshot, message }: Props) {
     const keydown = (e: KeyboardEvent) => engine.keydown(e);
     const keyup = (e: KeyboardEvent) => engine.keyup(e);
     const mousemove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      const sx = (e.clientX - rect.left) / rect.width;
-      const sy = (e.clientY - rect.top) / rect.height;
-      const ax = sx * 2 - 1;
-      const ay = sy * 2 - 1;
-      engine.setAim(Math.atan2(ay, ax));
+      const me = engine.interpolateSelf();
+      if (!me) return;
+      const { x, y } = renderer.screenToWorld(e.clientX, e.clientY);
+      engine.setAim(Math.atan2(y - me.y, x - me.x));
     };
     const mousedown = (e: MouseEvent) => {
       if (e.button === 0) engine.setFiring(true);

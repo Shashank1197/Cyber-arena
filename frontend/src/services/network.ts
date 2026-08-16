@@ -53,6 +53,9 @@ export class NetworkClient {
   move(x: number, y: number, angle: number) {
     this.send("move", { x, y, angle });
   }
+  setAim(angle: number) {
+    this.send("aim", { angle });
+  }
   shoot(angle: number) {
     this.send("shoot", { angle });
   }

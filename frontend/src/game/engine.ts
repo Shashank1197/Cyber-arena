@@ -100,6 +100,13 @@ export class ClientEngine {
       this.net.move(mx, my, this.aimAngle);
     }
 
+    // Send aim at frame rate (separate from movement) so targeting feels live.
+    this.aimAccum += dt;
+    if (this.aimAccum >= AIM_SEND_INTERVAL) {
+      this.aimAccum = 0;
+      this.net.setAim(this.aimAngle);
+    }
+
     // Continuous fire: send a shot every tick while the button is held.
     if (this.firing) {
       this.net.shoot(this.aimAngle);

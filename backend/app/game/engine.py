@@ -114,6 +114,13 @@ class GameEngine:
         if isinstance(angle, (int, float)) and math.isfinite(angle):
             player.angle = float(angle) % (2 * math.pi)
 
+    def set_aim(self, pid: str, angle: float) -> None:
+        player = self.players.get(pid)
+        if not player or not player.alive:
+            return
+        if isinstance(angle, (int, float)) and math.isfinite(angle):
+            player.angle = float(angle) % (2 * math.pi)
+
     def fire(self, pid: str, angle: float) -> None:
         player = self.players.get(pid)
         if not player or not player.alive:

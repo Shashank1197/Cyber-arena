@@ -204,6 +204,12 @@ class GameServer:
             player_id, float(msg.get("x", 0)), float(msg.get("y", 0)), float(msg.get("angle", 0))
         )
 
+    async def _on_aim(self, conn_id: str, msg: dict) -> None:
+        room, player_id = self._room_and_player(conn_id)
+        if not room or not room.engine:
+            return
+        room.engine.set_aim(player_id, float(msg.get("angle", 0)))
+
     async def _on_shoot(self, conn_id: str, msg: dict) -> None:
         room, player_id = self._room_and_player(conn_id)
         if not room or not room.engine:
