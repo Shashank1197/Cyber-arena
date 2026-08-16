@@ -1,0 +1,24 @@
+services:
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8000
+      # Set to your public origin so the browser may call it cross-origin-safe.
+      # For the nginx-proxy setup below the frontend and backend share one
+      # origin, but keep this accurate for direct-API/health access.
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+      # Leave empty to run with in-memory persistence, or point at MongoDB.
+      MONGO_URL: ${MONGO_URL:-}
+      MONGO_DB: ${MONGO_DB:-cyber_arena}
+    expose:
+      - "8000"
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${PORT:-8080}:80"
