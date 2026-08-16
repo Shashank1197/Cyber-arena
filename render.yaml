@@ -9,7 +9,7 @@ services:
   - type: web
     name: cyber-arena-backend
     runtime: docker
-    repo: https://github.com/YOUR_USER/YOUR_REPO
+    repo: https://github.com/Shashank1197/Cyber-arena
     dockerfilePath: ./backend/Dockerfile
     envVars:
       - key: HOST
