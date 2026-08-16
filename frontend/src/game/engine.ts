@@ -2,6 +2,7 @@ import type { NetworkClient } from "../services/network";
 import type { GameSnapshot, PlayerSnapshot } from "../types";
 
 const MOVE_SEND_INTERVAL = 1 / 15; // ~15 movement updates/sec
+const AIM_SEND_INTERVAL = 1 / 60; // aim is sent at frame rate for snappy aiming
 
 interface InputState {
   up: boolean;
@@ -23,6 +24,7 @@ export class ClientEngine {
   private input: InputState = { up: false, down: false, left: false, right: false };
   private aimAngle = 0;
   private moveAccum = 0;
+  private aimAccum = 0;
   private firing = false;
   private myId: string;
   private latestPlayers: PlayerSnapshot[] = [];
@@ -56,6 +58,10 @@ export class ClientEngine {
 
   setAim(angle: number) {
     this.aimAngle = angle;
+  }
+
+  getAim() {
+    return this.aimAngle;
   }
 
   /** Fire continuously while the mouse is held (no cooldown). */

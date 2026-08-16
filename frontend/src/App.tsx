@@ -77,11 +77,13 @@ export default function App() {
         setSnapshot(lastMessage.snapshot);
         break;
       case "match_started":
+        setResults(null);
         setSession((s) => (s ? { ...s, state: "playing" } : s));
         setSnapshot(null);
         setShowLobby(false);
         break;
       case "match_countdown":
+        setResults(null);
         setSession((s) => (s ? { ...s, state: "countdown" } : s));
         break;
       case "match_ended":
