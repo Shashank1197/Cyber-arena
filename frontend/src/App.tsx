@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNetwork } from "./hooks/useNetwork";
 import { HomeScreen } from "./components/HomeScreen";
 import { LobbyScreen } from "./components/LobbyScreen";
@@ -21,9 +21,29 @@ interface Session {
 export default function App() {
   const { client, status, lastMessage } = useNetwork();
   const [session, setSession] = useState<Session | null>(null);
+  const [reconnecting, setReconnecting] = useState(false);
   const [snapshot, setSnapshot] = useState<GameSnapshot | null>(null);
   const [results, setResults] = useState<MatchResult[] | null>(null);
   const [showLobby, setShowLobby] = useState(true);
+  const prevStatusRef = useRef<string>("connecting");
+
+  // Track connection drops so the UI can show a "reconnecting" banner.
+  useEffect(() => {
+    if (status === "open") setReconnecting(false);
+    else if (status !== "connecting") setReconnecting(true);
+  }, [status]);
+
+  // When the socket reopens after having been dropped mid-session, re-send
+  // "reconnect" so the server re-binds this connection to its room. Without
+  // this, an auto-reconnected socket receives no snapshots and the game freezes.
+  useEffect(() => {
+    const wasConnected = prevStatusRef.current === "open";
+    const nowConnected = status === "open";
+    prevStatusRef.current = status;
+    if (nowConnected && !wasConnected && session) {
+      client.reconnect(session.playerId, session.roomCode);
+    }
+  }, [status, session, client]);
 
   // React to each inbound message (state transitions only).
   useEffect(() => {
@@ -106,19 +126,27 @@ export default function App() {
     );
   }
 
+  const banner = reconnecting ? (
+    <div className="reconnect-banner">Reconnecting…</div>
+  ) : null;
+
   if (snapshot) {
     return (
-      <GameScreen
-        client={client}
-        playerId={session.playerId}
-        snapshot={snapshot}
-        message={lastMessage}
-      />
+      <>
+        {banner}
+        <GameScreen
+          client={client}
+          playerId={session.playerId}
+          snapshot={snapshot}
+          message={lastMessage}
+        />
+      </>
     );
   }
 
   return (
     <div className="screen">
+      {banner}
       <div className="panel">
         <div className="logo">CYBER ARENA</div>
         <div className="hint">Waiting for match to start...</div>
