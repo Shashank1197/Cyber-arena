@@ -70,12 +70,18 @@ export function GameScreen({ client, playerId, snapshot, message }: Props) {
       engine.setAim(Math.atan2(ay, ax));
     };
     const mousedown = (e: MouseEvent) => {
-      if (e.button === 0) engine.fireOnce();
+      if (e.button === 0) engine.setFiring(true);
     };
+    const mouseup = (e: MouseEvent) => {
+      if (e.button === 0) engine.setFiring(false);
+    };
+    const onBlur = () => engine.resetInput();
     window.addEventListener("keydown", keydown);
     window.addEventListener("keyup", keyup);
     window.addEventListener("mousemove", mousemove);
     window.addEventListener("mousedown", mousedown);
+    window.addEventListener("mouseup", mouseup);
+    window.addEventListener("blur", onBlur);
 
     let raf = 0;
     let last = performance.now();
@@ -97,6 +103,8 @@ export function GameScreen({ client, playerId, snapshot, message }: Props) {
       window.removeEventListener("keyup", keyup);
       window.removeEventListener("mousemove", mousemove);
       window.removeEventListener("mousedown", mousedown);
+      window.removeEventListener("mouseup", mouseup);
+      window.removeEventListener("blur", onBlur);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

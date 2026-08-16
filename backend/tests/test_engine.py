@@ -83,11 +83,11 @@ def test_respawn_after_delay():
     assert p2.health == C.MAX_HEALTH
 
 
-def test_fire_cooldown_limits_rate():
+def test_fire_has_no_cooldown():
     engine = _engine(("p1",))
     engine.fire("p1", 0.0)
-    engine.fire("p1", 0.0)  # immediately -> ignored
-    assert len(engine.projectiles) == 1
+    engine.fire("p1", 0.0)  # continuous fire -> both shots spawn
+    assert len(engine.projectiles) == 2
 
 
 # --------------------------------------------------------------- score

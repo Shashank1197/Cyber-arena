@@ -116,13 +116,12 @@ class GameEngine:
 
     def fire(self, pid: str, angle: float) -> None:
         player = self.players.get(pid)
-        if not player or not player.alive or player.fire_cooldown > 0:
+        if not player or not player.alive:
             return
         if not isinstance(angle, (int, float)) or not math.isfinite(angle):
             angle = player.angle
         angle = float(angle) % (2 * math.pi)
         player.angle = angle
-        player.fire_cooldown = C.FIRE_COOLDOWN
 
         ox = math.cos(angle)
         oy = math.sin(angle)

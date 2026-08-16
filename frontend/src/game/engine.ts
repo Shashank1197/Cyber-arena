@@ -23,6 +23,7 @@ export class ClientEngine {
   private input: InputState = { up: false, down: false, left: false, right: false };
   private aimAngle = 0;
   private moveAccum = 0;
+  private firing = false;
   private myId: string;
   private latestPlayers: PlayerSnapshot[] = [];
   lastSnapshot: GameSnapshot | null = null;
@@ -57,9 +58,14 @@ export class ClientEngine {
     this.aimAngle = angle;
   }
 
-  /** Fire a single shot on click. */
-  fireOnce() {
-    this.net.shoot(this.aimAngle);
+  /** Fire continuously while the mouse is held (no cooldown). */
+  setFiring(firing: boolean) {
+    this.firing = firing;
+  }
+
+  /** Clear all pressed movement keys (e.g. on window blur). */
+  resetInput() {
+    this.input = { up: false, down: false, left: false, right: false };
   }
 
   /** Apply the latest authoritative snapshot (players only). */
@@ -86,6 +92,11 @@ export class ClientEngine {
     if (this.moveAccum >= MOVE_SEND_INTERVAL) {
       this.moveAccum = 0;
       this.net.move(mx, my, this.aimAngle);
+    }
+
+    // Continuous fire: send a shot every tick while the button is held.
+    if (this.firing) {
+      this.net.shoot(this.aimAngle);
     }
   }
 
