@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { NetworkClient } from "../services/network";
+import { sound } from "../services/sound";
 
 interface Props {
   client: NetworkClient;
@@ -19,6 +20,7 @@ export function HomeScreen({ client, connectionStatus }: Props) {
   const sanitized = name.trim();
 
   const handleCreate = () => {
+    sound.playClick();
     if (!sanitized) {
       setError("Enter a display name first.");
       return;
@@ -28,6 +30,7 @@ export function HomeScreen({ client, connectionStatus }: Props) {
   };
 
   const handleJoin = () => {
+    sound.playClick();
     if (!sanitized) {
       setError("Enter a display name first.");
       return;
@@ -91,10 +94,10 @@ export function HomeScreen({ client, connectionStatus }: Props) {
         {mode === "menu" && (
           <>
             <div className="row">
-              <button className="btn" onClick={() => setMode("create")}>
+              <button className="btn" onClick={() => { sound.playClick(); setMode("create"); }}>
                 CREATE ROOM
               </button>
-              <button className="btn secondary" onClick={() => setMode("join")}>
+              <button className="btn secondary" onClick={() => { sound.playClick(); setMode("join"); }}>
                 JOIN ROOM
               </button>
             </div>

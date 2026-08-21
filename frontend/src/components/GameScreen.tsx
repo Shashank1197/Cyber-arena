@@ -4,6 +4,7 @@ import { ClientEngine } from "../game/engine";
 import { Renderer } from "../game/renderer";
 import { CONTROLS_TEXT } from "../game/constants";
 import type { GameSnapshot, InboundMessage, PlayerSnapshot } from "../types";
+import { sound } from "../services/sound";
 
 interface Props {
   client: NetworkClient;
@@ -127,21 +128,35 @@ export function GameScreen({ client, playerId, snapshot, message }: Props) {
   useEffect(() => {
     if (!message) return;
     if (message.type === "match_countdown") {
+      sound.playCountdown(message.seconds);
       setCountdown(message.seconds);
       if (message.seconds <= 0) setCountdown(null);
     } else if (message.type === "event") {
-      const ev = message.event;
-      if (ev.type === "player_killed") {
+      const ev = message.event as any;
+      if (ev.type === "bullet_spawn") {
+        sound.playShoot(ev.owner_id === playerId);
+      } else if (ev.type === "player_damaged") {
+        if (ev.target_id === playerId) {
+          sound.playHurt();
+        } else if (ev.attacker_id === playerId) {
+          sound.playHitmarker();
+        } else {
+          sound.playImpact();
+        }
+      } else if (ev.type === "player_killed") {
+        sound.playDeath(ev.victim_id === playerId);
         const killerName =
           snapshot.players.find((p) => p.id === ev.killer_id)?.name ?? "?";
         const victimName =
           snapshot.players.find((p) => p.id === ev.victim_id)?.name ?? "?";
         pushToast(`${killerName} eliminated ${victimName}`, "kill");
       } else if (ev.type === "node_captured") {
+        sound.playCapture();
         const ownerName =
           snapshot.players.find((p) => p.id === ev.owner_id)?.name ?? "?";
         pushToast(`${ownerName} captured node ${ev.node_id}`, "capture");
       } else if (ev.type === "powerup_collected") {
+        sound.playPowerup();
         const pName =
           snapshot.players.find((p) => p.id === ev.player_id)?.name ?? "?";
         pushToast(`${pName} picked up ${ev.powerup_type}`, "info");

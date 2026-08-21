@@ -1,5 +1,6 @@
 import type { NetworkClient } from "../services/network";
 import type { LobbyPlayer } from "../types";
+import { sound } from "../services/sound";
 
 interface Props {
   client: NetworkClient;
@@ -18,10 +19,12 @@ export function LobbyScreen({ client, roomCode, players, hostId, myId }: Props) 
   const canStart = players.filter((p) => p.connected).length >= 2;
 
   const handleStart = () => {
+    sound.playClick();
     client.startMatch();
   };
 
   const handleCopy = () => {
+    sound.playClick();
     navigator.clipboard?.writeText(roomCode);
   };
 

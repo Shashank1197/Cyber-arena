@@ -1,5 +1,6 @@
 import type { NetworkClient } from "../services/network";
 import type { MatchResult } from "../types";
+import { sound } from "../services/sound";
 
 interface Props {
   client: NetworkClient;
@@ -69,11 +70,11 @@ export function ResultsScreen({ client, results, myId }: Props) {
 
         <div className="divider" />
 
-        <button className="btn" onClick={() => client.playAgain()}>
+        <button className="btn" onClick={() => { sound.playClick(); client.playAgain(); }}>
           PLAY AGAIN
         </button>
         <div style={{ height: 10 }} />
-        <button className="btn secondary" onClick={() => client.returnLobby()}>
+        <button className="btn secondary" onClick={() => { sound.playClick(); client.returnLobby(); }}>
           RETURN TO LOBBY
         </button>
       </div>
